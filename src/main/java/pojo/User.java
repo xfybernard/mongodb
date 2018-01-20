@@ -3,6 +3,7 @@ package pojo;
 import java.math.BigDecimal;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection="users")
 public class User {
@@ -14,6 +15,9 @@ public class User {
 	private int age;
 	private BigDecimal salary;
 	private Double lenght;
+	
+	@DBRef
+	private Comments comments;
 
 	public ObjectId getId() {
 		return id;
@@ -77,6 +81,14 @@ public class User {
 
 	public void setLenght(Double lenght) {
 		this.lenght = lenght;
+	}
+
+	public Comments getComments() {
+		return comments;
+	}
+
+	public void setComments(Comments comments) {
+		this.comments = comments;
 	}
 
 	@Override

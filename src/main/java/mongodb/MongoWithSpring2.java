@@ -1,5 +1,17 @@
 package mongodb;
 
+import static com.mongodb.client.model.Aggregates.limit;
+import static com.mongodb.client.model.Aggregates.match;
+import static com.mongodb.client.model.Aggregates.project;
+import static com.mongodb.client.model.Aggregates.skip;
+import static com.mongodb.client.model.Aggregates.sort;
+import static com.mongodb.client.model.Aggregates.unwind;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Projections.fields;
+import static com.mongodb.client.model.Projections.include;
+import static com.mongodb.client.model.Sorts.ascending;
+import static com.mongodb.client.model.Sorts.orderBy;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -17,10 +29,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.mongodb.Block;
 import com.mongodb.MongoClient;
+import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.PushOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
@@ -43,6 +57,7 @@ public class MongoWithSpring2 {
 	public void init(){
 		db = client.getDatabase("bernard");
 		collections = db.getCollection("users2");
+	//	collections = db.getCollection("users");  测试dbref时启用并注释上一行
 	}
 	
 	/**测试elemMatch操作符，数组中对象数据要符合查询对象里面所有的字段
@@ -107,10 +122,84 @@ public class MongoWithSpring2 {
 	
 	
 	/**
-	 * 点击下一次重新加载评论数据
+	 * 查看人员时加载最新的三条评论(包括人员信息和评论数据)
+	 *    //db.users.find({"username":"lison"},{"comments":{"$slice":[0,3]}}).pretty()
 	 */
+	@Test
 	public void testReloadComments(){
-		
+		final List<Document> retList = new ArrayList<>();
+		Block<Document> printBlock = new Block<Document>() {
+			@Override
+			public void apply(Document t) {
+				System.out.println(t.toJson());
+				retList.add(t);
+			}
+		};
+		FindIterable<Document> find = collections.find(Filters.eq("username", "lison"))
+				.projection(Projections.slice("comments", 0, 3));
+		find.forEach(printBlock);
 	}
 	
+	/**
+	 * 查看人员时加载最新的三条评论(仅查询评论数据)；
+	 * db.users.find({"username":"lison"},{"comments":{"$slice":[3,3]},"$id":1}).pretty();
+	 */
+	@Test
+	public void testOnlyComments(){
+		final List<Document> retList = new ArrayList<>();
+		Block<Document> printBlock = new Block<Document>() {
+			@Override
+			public void apply(Document t) {
+				System.out.println(t.toJson());
+				retList.add(t);
+			}
+		};
+		Bson filter = Filters.eq("username", "lison");
+		Bson slice = Projections.slice("comments", 3, 3);
+		Bson id = Projections.include("id");
+		Bson projections = Projections.fields(slice,id);
+		FindIterable<Document> find = collections.find(filter).projection(projections);
+		find.forEach(printBlock);
+	}
+	
+	/**
+	 * ref
+	 */
+	@Test
+	public void testDbRef(){
+		final List<Document> retList = new ArrayList<>();
+		Block<Document> printBlock = new Block<Document>() {
+			@Override
+			public void apply(Document t) {
+				System.out.println(t.get("comments"));
+				retList.add(t);
+			}
+		};
+		FindIterable<Document> find = collections.find(Filters.eq("username", "lison"));
+		find.forEach(printBlock);
+	}
+	
+	
+    //如果有多种排序需求怎么处理,使用聚合
+	@Test
+    public void demoStep4(){
+    	final List<Document> retList = new ArrayList<>();
+		Block<Document> printBlock = new Block<Document>() {
+			@Override
+			public void apply(Document t) {
+				System.out.println(t.toJson());
+				retList.add(t);
+			}
+		};
+		List<Bson> aggregates = new ArrayList<>();
+    	aggregates.add(match(eq("username","lison")));
+    	aggregates.add(unwind("$comments"));
+    	aggregates.add(sort(orderBy(ascending("comments.commentTime"))));
+    	aggregates.add(project(fields(include("comments"))));
+    	aggregates.add(skip(0));
+    	aggregates.add(limit(3));
+    	
+    	AggregateIterable<Document> aggregate = collections.aggregate(aggregates);
+    	aggregate.forEach(printBlock);
+    }
 }
