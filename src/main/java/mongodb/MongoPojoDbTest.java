@@ -28,7 +28,7 @@ import pojo.Address;
 import pojo.Favorites;
 import pojo.User;
 /**
- * 使用原生的jar操作mongodb ,基于pojo
+ * 使用原生的jar操作mongodb(增删改查) ,基于pojo
  * @author Administrator
  *
  */
@@ -39,6 +39,7 @@ public class MongoPojoDbTest {
 	
 	@Before
 	public void init() {
+		//注册pojo编解码器
 		List<CodecRegistry>  codecRegistryList = new ArrayList<>();
 		codecRegistryList.add(MongoClient.getDefaultCodecRegistry());
 		CodecRegistry pojoProviders = CodecRegistries.fromProviders(
@@ -58,7 +59,7 @@ public class MongoPojoDbTest {
     	user.setUsername("cang");
     	user.setCountry("USA");
     	user.setAge(20);
-    	user.setLenght(1.77);
+    	user.setLenght(1.77f);
     	user.setSalary(new BigDecimal("6265.22"));
     	Address address1 = new Address();
     	address1.setaCode("411222");
@@ -74,7 +75,7 @@ public class MongoPojoDbTest {
     	user1.setUsername("chen");
     	user1.setCountry("China");
     	user1.setAge(30);
-    	user1.setLenght(1.77);
+    	user1.setLenght(1.77f);
     	user1.setSalary(new BigDecimal("6885.22"));
     	Address address2 = new Address();
     	address2.setaCode("411000");
@@ -109,7 +110,7 @@ public class MongoPojoDbTest {
 		//update users  set favorites.movies add "小电影2 ", "小电影3"
 		//where favorites.cites  has "东莞"
 		this.collections.updateMany(Filters.eq("favorites.cites", "东莞"),
-				Updates.addEachToSet("favorites.movies", Arrays.asList("xdy..")));
+				Updates.addEachToSet("favorites.movies", Arrays.asList("小电影2","小电影3")));
 	}
 	
 	@Test

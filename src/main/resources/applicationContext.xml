@@ -19,6 +19,15 @@
 			threads-allowed-to-block-for-connection-multiplier="5"
 		/>
 	</mongo:mongo-client>
+	
+	<!-- mongodb连接需受权的数据库 用户名:密码@数据库名-->
+	<!--  
+	<mongo:mongo-client host="192.168.130.129" port="27022" id="mongo-client"
+		credentials="bernard:bernard@bernard"
+	>
+	</mongo:mongo-client>
+	-->
+	
 	<!-- mongodb数据库工厂配置 -->
 	<mongo:db-factory  dbname="bernard" mongo-ref="mongo-client" />
 	<!-- 配置mongodb的转换器 -->

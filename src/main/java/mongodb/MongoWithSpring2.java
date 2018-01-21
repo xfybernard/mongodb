@@ -56,8 +56,8 @@ public class MongoWithSpring2 {
 	@Before
 	public void init(){
 		db = client.getDatabase("bernard");
-		collections = db.getCollection("users2");
-	//	collections = db.getCollection("users");  测试dbref时启用并注释上一行
+		collections = db.getCollection("users");
+	//	collections = db.getCollection("users_dbf");  //测试dbref时启用并注释上一行
 	}
 	
 	/**测试elemMatch操作符，数组中对象数据要符合查询对象里面所有的字段
@@ -179,7 +179,15 @@ public class MongoWithSpring2 {
 		find.forEach(printBlock);
 	}
 	
-	
+	/**
+	 * db.users.aggregate([{"$match":{"username":"lison"}},
+	                       {"$unwind":"$comments"},
+	                       {$sort:{"comments.commentTime":-1}},
+	                       {"$project":{"comments":1}},
+	                       {"$skip":6},
+	                       {"$limit":3}])
+	                       
+	 */
     //如果有多种排序需求怎么处理,使用聚合
 	@Test
     public void demoStep4(){

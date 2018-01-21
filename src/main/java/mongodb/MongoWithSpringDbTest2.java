@@ -30,8 +30,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.mongodb.WriteResult;
 
-import pojo.Comments;
+import pojo.Comment;
 import pojo.User;
+import pojo.UserDbRef;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:applicationContext.xml")
@@ -41,17 +42,16 @@ public class MongoWithSpringDbTest2 {
 	private MongoOperations tempelate;
 
 	@Test
-	// db.users.find({"comments":{"$elemMatch":{"author" : "lison5","content" :
+	// db.users_dbf.find({"comments":{"$elemMatch":{"author" : "lison5","content" :
 	// "lison是苍老师的小迷弟"}}}) .pretty()
 	public void testElemMatch() {
 		Query query = query(where("comments").elemMatch(where("author").is("lison5").and("content").is("lison是苍老师的小迷弟")));
 		List<User> find = tempelate.find(query, User.class);
 		System.out.println(find.size());
-
 	}
 
     /**
-     * 			db.users.updateOne({"username":"lison",},
+     * 			db.users_dbf.updateOne({"username":"lison",},
 					{"$push": {
 						 "comments": {
 						   $each: [{
@@ -67,7 +67,7 @@ public class MongoWithSpringDbTest2 {
 	// 新增评论时，使用$sort运算符进行排序，插入评论后，再按照评论时间降序排序
 	public void demoStep1() {
 		Query query = query(where("username").is("lison"));
-		Comments comment = new Comments();
+		Comment comment = new Comment();
 		comment.setAuthor("cang");
 		comment.setCommentTime(new Date());
 		comment.setContent("lison是我的粉丝");
@@ -85,7 +85,7 @@ public class MongoWithSpringDbTest2 {
 
 	@Test
 	// 查看人员时加载最新的三条评论；
-	// db.users.find({"username":"lison"},{"comments":{"$slice":[0,3]}}).pretty()
+	// db.users_dbf.find({"username":"lison"},{"comments":{"$slice":[0,3]}}).pretty()
 	public void demoStep2() {
 		//{"username":"lison"}
 		Query query = query(where("username").is("lison"));
@@ -99,7 +99,7 @@ public class MongoWithSpringDbTest2 {
 
 	@Test
 	// 点击评论的下一页按钮，新加载三条评论
-	// db.users.find({"username":"lison"},{"comments":{"$slice":[3,3]},"$id":1}).pretty();
+	// db.users_dbf.find({"username":"lison"},{"comments":{"$slice":[3,3]},"$id":1}).pretty();
 	public void demoStep3() {
 		Query query = query(where("username").is("lison"));
 		query.fields().include("comments").slice("comments", 3, 3)
@@ -112,7 +112,7 @@ public class MongoWithSpringDbTest2 {
 
 	
 	/**
-	 * db.users.aggregate([{"$match":{"username":"lison"}},
+	 * db.users_dbf.aggregate([{"$match":{"username":"lison"}},
 	                       {"$unwind":"$comments"},
 	                       {$sort:{"comments.commentTime":-1}},
 	                       {"$project":{"comments":1}},
@@ -131,11 +131,10 @@ public class MongoWithSpringDbTest2 {
 				skip(6l), 
 				limit(3));
 		System.out.println("---------------");
-		AggregationResults<Object> aggregate = tempelate.aggregate(aggs, "users",	Object.class);
+		AggregationResults<Object> aggregate = tempelate.aggregate(aggs, "users_dbf",	Object.class);
 		System.out.println("---------------");
 		List<Object> mappedResults = aggregate.getMappedResults();
 		System.out.println(mappedResults.size());
-
 	}
 	
 	@Test
@@ -143,10 +142,10 @@ public class MongoWithSpringDbTest2 {
 	//(2)spring对dbRef进行了封装，发起了两次查询请求
 	public void dbRefTest(){
 		System.out.println("----------------------------");
-		List<User> users = tempelate.findAll(User.class);
+		List<UserDbRef> users = tempelate.findAll(UserDbRef.class);
 		System.out.println("----------------------------");
-		System.out.println(users);
-//		System.out.println(users.get(0).getComments());
+//		System.out.println(users);
+		System.out.println(users.get(0).getComments());
 	}
 
 }

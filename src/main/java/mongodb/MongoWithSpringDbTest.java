@@ -25,7 +25,7 @@ import pojo.Address;
 import pojo.Favorites;
 import pojo.User;
 /**
- * mongodb集成spring开发
+ * mongodb集成spring开发(增删改查)
  * @author Administrator
  *
  */
@@ -42,7 +42,7 @@ public class MongoWithSpringDbTest {
     	user.setUsername("cang");
     	user.setCountry("USA");
     	user.setAge(20);
-    	user.setLenght(1.77);
+    	user.setLenght(1.77f);
     	user.setSalary(new BigDecimal("6265.22"));
     	Address address1 = new Address();
     	address1.setaCode("411222");
@@ -58,7 +58,7 @@ public class MongoWithSpringDbTest {
     	user1.setUsername("chen");
     	user1.setCountry("China");
     	user1.setAge(30);
-    	user1.setLenght(1.77);
+    	user1.setLenght(1.77f);
     	user1.setSalary(new BigDecimal("6885.22"));
     	Address address2 = new Address();
     	address2.setaCode("411000");

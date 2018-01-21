@@ -21,7 +21,7 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 
 /**
- * 使用原生的jar操作mongodb ,基于document
+ * 使用原生的jar操作mongodb(增删改查) ,基于document
  * @author Administrator
  *
  */
@@ -38,6 +38,12 @@ public class MongoDocumentDbTest {
 		client = new MongoClient("192.168.130.129", 27022);
 		db = client.getDatabase("bernard");
 		collections = db.getCollection("users");
+		//连接需要受权的 数据库 createCredential(用户名,数据库名,密码)
+		/*MongoCredential credential = MongoCredential.
+				createCredential("bernard","bernard","bernard".toCharArray());
+		client = new MongoClient(new ServerAddress("192.168.130.129", 27022),
+				Arrays.asList(credential));
+		*/
 	}
 
 	/**
