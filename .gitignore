@@ -1,1 +1,15 @@
 /target/
+#ignore package files
+*.class
+*.jar
+*.war
+
+#ignore eclipse files
+.settings
+.metadata
+.mymetadata
+.project
+.classpath
+#ignore ideal files
+.idea
+.iml
